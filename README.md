@@ -2,13 +2,33 @@
 
 **Build an AI agent in any language. Control it from your phone — anywhere.**
 
-[中文文档](./README.zh.md) · [Protocol Spec](./PROTOCOL.md) · [codyer.com](https://codyer.com)
+[中文文档](./README.zh.md) · [Protocol Spec](./PROTOCOL.md) · [shennian.ai](https://shennian.ai) · [shennian.net](https://shennian.net)
 
 ---
 
-[Shennian](https://codyer.com) is a mobile console for AI agents. Run it on your machine, scan to pair, and control Claude, Codex, Gemini, or **your own custom agent** from your phone, browser, or desktop — with push notifications, file browsing, and machine sharing built in.
+## What is Shennian?
 
-This repo defines the **open protocol** that lets any agent plug into Shennian. Your agent is just a CLI program. It reads stdin, writes JSON Lines to stdout. Shennian handles everything else.
+**Shennian** is a mobile console for AI agents. Run one command on your machine, scan to pair, and remotely control Claude, Codex, Gemini, Cursor, and more from your phone, browser, or desktop — with push notifications, file browsing, and machine sharing built in.
+
+| | |
+|---|---|
+| 🌐 Global | [shennian.ai](https://shennian.ai) |
+| 🇨🇳 China | [shennian.net](https://shennian.net) |
+| 📱 iOS / Android | Coming soon |
+| 💻 macOS / Windows | Coming soon |
+
+**Key capabilities:**
+- **Multi-agent** — Switch between Claude, Codex, Gemini, Cursor, OpenClaw in one console
+- **File system** — Browse, preview, upload, and download from your phone — no SSH
+- **Push notifications** — Get notified when a task completes or an alert fires
+- **Machine sharing** — Grant time-limited, permission-scoped access to teammates
+- **Custom agents** — Plug in any agent via this open protocol ← *you are here*
+
+---
+
+## This Repo: The Custom Agent Protocol
+
+This repo defines the **open protocol** that lets any third-party agent plug into Shennian. Your agent is just a CLI program. It reads from stdin, writes JSON Lines to stdout. Shennian handles the rest — WebSocket relay, mobile UI, push notifications.
 
 ```
 Phone / Browser ←→ Shennian Cloud ←→ Shennian CLI ←→ stdin/stdout ←→ Your Agent

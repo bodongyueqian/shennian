@@ -2,13 +2,33 @@
 
 **用任意语言构建 AI Agent，随时随地从手机掌控它。**
 
-[English](./README.md) · [协议规范](./PROTOCOL.md) · [codyer.com](https://codyer.com)
+[English](./README.md) · [协议规范](./PROTOCOL.md) · [shennian.ai](https://shennian.ai) · [shennian.net](https://shennian.net)
 
 ---
 
-[神念（Shennian）](https://codyer.com) 是一款 AI Agent 移动控制台。在本机运行一条命令，扫码配对，即可从手机、浏览器或桌面远程操控 Claude、Codex、Gemini，或**你自己构建的 Agent**——内置文件浏览、推送通知、机器共享。
+## 神念是什么？
 
-本仓库定义了让任意 Agent 接入神念的**开放协议**。你的 Agent 只是一个 CLI 程序，从 stdin 读消息，向 stdout 写 JSON Lines，其余的网络、推送、UI 全由神念负责。
+**神念（Shennian）** 是一款 AI Agent 移动控制台。在本机运行一条命令，扫码配对，即可从手机、浏览器或桌面远程操控 Claude、Codex、Gemini、Cursor 等 AI Agent——内置文件浏览、推送通知、机器共享。
+
+| | |
+|---|---|
+| 🌐 国际站 | [shennian.ai](https://shennian.ai) |
+| 🇨🇳 国内站 | [shennian.net](https://shennian.net) |
+| 📱 iOS / Android | 即将上线 |
+| 💻 macOS / Windows | 即将上线 |
+
+**核心功能：**
+- **多 Agent 支持** — 统一控制台切换 Claude、Codex、Gemini、Cursor、OpenClaw
+- **内置文件系统** — 手机浏览目录、预览代码、上传下载，无需 SSH
+- **推送通知** — 任务完成、告警触发，实时推送到手机
+- **机器共享** — 生成带权限和有效期的分享码，授权给队友，随时撤销
+- **自定义 Agent** — 通过本开放协议接入任意 Agent ← *你正在查看*
+
+---
+
+## 本仓库：自定义 Agent 协议
+
+本仓库定义了让任意第三方 Agent 接入神念的**开放协议**。你的 Agent 只是一个 CLI 程序，从 stdin 读消息，向 stdout 写 JSON Lines，其余的网络中转、手机 UI、推送通知全由神念负责。
 
 ```
 手机 / 浏览器 ←→ 神念云端 ←→ 神念 CLI ←→ stdin/stdout ←→ 你的 Agent
