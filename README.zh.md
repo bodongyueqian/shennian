@@ -8,22 +8,34 @@
 
 ## 神念是什么？
 
-**神念（Shennian）** 是一款 AI Agent 移动控制台。在本机运行一条命令，扫码配对，即可从手机、浏览器或桌面远程操控 Claude、Codex、Gemini、Cursor 等 AI Agent——内置文件浏览、推送通知、机器共享。
+**神念（Shennian）** 是一款 AI Agent 移动控制台。在本机运行一条命令，扫码配对，即可从手机、浏览器或桌面远程操控 AI Agent——内置文件浏览、推送通知、机器共享。
 
 **立即体验：** [shennian.ai](https://shennian.ai) · [shennian.net](https://shennian.net)
 
-**核心功能：**
-- **多 Agent 支持** — 统一控制台切换 Claude、Codex、Gemini、Cursor、OpenClaw
-- **内置文件系统** — 手机浏览目录、预览代码、上传下载，无需 SSH
-- **推送通知** — 任务完成、告警触发，实时推送到手机
-- **机器共享** — 生成带权限和有效期的分享码，授权给队友，随时撤销
-- **自定义 Agent** — 通过本开放协议接入任意 Agent ← *你正在查看*
+```bash
+# 在本机启动神念 CLI
+npx shennian
+
+# 扫码配对，即可从手机操控
+```
+
+**内置 Agent**（安装后自动出现在神念 App，无需额外配置）：
+
+| Agent | 安装方式 |
+|---|---|
+| [Claude](https://claude.ai/code) | `npm install -g @anthropic-ai/claude-code` |
+| [Codex](https://github.com/openai/codex) | `npm install -g @openai/codex` |
+| [Gemini](https://github.com/google-gemini/gemini-cli) | `npm install -g @google/gemini-cli` |
+| [Cursor](https://www.cursor.com) | 桌面客户端 |
+| [OpenClaw](https://openclaw.ai) | `npm install -g openclaw` |
+
+以上任意 Agent 安装在本机后，打开神念 App 即可直接使用，无需额外配置。
 
 ---
 
 ## 本仓库：自定义 Agent 协议
 
-本仓库定义了让任意第三方 Agent 接入神念的**开放协议**。你的 Agent 只是一个 CLI 程序，从 stdin 读消息，向 stdout 写 JSON Lines，其余的网络中转、手机 UI、推送通知全由神念负责。
+除内置 Agent 外，神念支持通过本开放协议接入**任意自定义 Agent**。你的 Agent 只是一个从 stdin 读消息、向 stdout 写 JSON Lines 的 CLI 程序，其余全由神念负责。
 
 ```
 手机 / 浏览器 ←→ 神念云端 ←→ 神念 CLI ←→ stdin/stdout ←→ 你的 Agent

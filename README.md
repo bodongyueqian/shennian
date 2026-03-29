@@ -8,22 +8,34 @@
 
 ## What is Shennian?
 
-**Shennian** is a mobile console for AI agents. Run one command on your machine, scan to pair, and remotely control Claude, Codex, Gemini, Cursor, and more from your phone, browser, or desktop — with push notifications, file browsing, and machine sharing built in.
+**Shennian** is a mobile console for AI agents. Run one command on your machine, scan to pair, and remotely control your AI agents from your phone, browser, or desktop — with push notifications, file browsing, and machine sharing built in.
 
 **Try it:** [shennian.ai](https://shennian.ai) · [shennian.net](https://shennian.net)
 
-**Key capabilities:**
-- **Multi-agent** — Switch between Claude, Codex, Gemini, Cursor, OpenClaw in one console
-- **File system** — Browse, preview, upload, and download from your phone — no SSH
-- **Push notifications** — Get notified when a task completes or an alert fires
-- **Machine sharing** — Grant time-limited, permission-scoped access to teammates
-- **Custom agents** — Plug in any agent via this open protocol ← *you are here*
+```bash
+# Start the Shennian CLI on your machine
+npx shennian
+
+# Scan the QR code to pair — then control from your phone
+```
+
+**Built-in agents** (ready to use, no configuration needed):
+
+| Agent | Install |
+|---|---|
+| [Claude](https://claude.ai/code) | `npm install -g @anthropic-ai/claude-code` |
+| [Codex](https://github.com/openai/codex) | `npm install -g @openai/codex` |
+| [Gemini](https://github.com/google-gemini/gemini-cli) | `npm install -g @google/gemini-cli` |
+| [Cursor](https://www.cursor.com) | Desktop app |
+| [OpenClaw](https://openclaw.ai) | `npm install -g openclaw` |
+
+Once any of these are installed on your machine, they appear automatically in the Shennian app — no extra setup.
 
 ---
 
 ## This Repo: The Custom Agent Protocol
 
-This repo defines the **open protocol** that lets any third-party agent plug into Shennian. Your agent is just a CLI program. It reads from stdin, writes JSON Lines to stdout. Shennian handles the rest — WebSocket relay, mobile UI, push notifications.
+Beyond the built-in agents, Shennian supports **any custom agent** via this open protocol. Your agent is just a CLI program that reads stdin and writes JSON Lines to stdout. Shennian handles the rest.
 
 ```
 Phone / Browser ←→ Shennian Cloud ←→ Shennian CLI ←→ stdin/stdout ←→ Your Agent
