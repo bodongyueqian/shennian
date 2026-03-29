@@ -10,12 +10,7 @@
 
 **神念（Shennian）** 是一款 AI Agent 移动控制台。在本机运行一条命令，扫码配对，即可从手机、浏览器或桌面远程操控 Claude、Codex、Gemini、Cursor 等 AI Agent——内置文件浏览、推送通知、机器共享。
 
-| | |
-|---|---|
-| 🌐 国际站 | [shennian.ai](https://shennian.ai) |
-| 🇨🇳 国内站 | [shennian.net](https://shennian.net) |
-| 📱 iOS / Android | 即将上线 |
-| 💻 macOS / Windows | 即将上线 |
+**立即体验：** [shennian.ai](https://shennian.ai) · [shennian.net](https://shennian.net)
 
 **核心功能：**
 - **多 Agent 支持** — 统一控制台切换 Claude、Codex、Gemini、Cursor、OpenClaw

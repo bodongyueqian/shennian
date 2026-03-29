@@ -10,12 +10,7 @@
 
 **Shennian** is a mobile console for AI agents. Run one command on your machine, scan to pair, and remotely control Claude, Codex, Gemini, Cursor, and more from your phone, browser, or desktop — with push notifications, file browsing, and machine sharing built in.
 
-| | |
-|---|---|
-| 🌐 Global | [shennian.ai](https://shennian.ai) |
-| 🇨🇳 China | [shennian.net](https://shennian.net) |
-| 📱 iOS / Android | Coming soon |
-| 💻 macOS / Windows | Coming soon |
+**Try it:** [shennian.ai](https://shennian.ai) · [shennian.net](https://shennian.net)
 
 **Key capabilities:**
 - **Multi-agent** — Switch between Claude, Codex, Gemini, Cursor, OpenClaw in one console
