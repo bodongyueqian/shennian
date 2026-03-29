@@ -1,24 +1,28 @@
 # Shennian Agent Protocol
 
-> Build an AI agent in any language. Control it from your phone.
+**Build an AI agent in any language. Control it from your phone — anywhere.**
 
-[Shennian](https://codyer.com) is a mobile control console for AI agents. This repo defines the **open protocol** for plugging any agent into the Shennian platform — and provides SDKs and examples to get you started in minutes.
-
-```
-Your Phone ←→ Shennian Cloud ←→ Shennian CLI ←→ stdin/stdout ←→ Your Agent
-```
-
-Your agent is just a CLI program. It reads from stdin, writes JSON Lines to stdout. Shennian handles everything else — WebSocket relay, mobile UI, push notifications, file transfer.
+[中文文档](./README.zh.md) · [Protocol Spec](./PROTOCOL.md) · [codyer.com](https://codyer.com)
 
 ---
 
-## Quick Start
+[Shennian](https://codyer.com) is a mobile console for AI agents. Run it on your machine, scan to pair, and control Claude, Codex, Gemini, or **your own custom agent** from your phone, browser, or desktop — with push notifications, file browsing, and machine sharing built in.
+
+This repo defines the **open protocol** that lets any agent plug into Shennian. Your agent is just a CLI program. It reads stdin, writes JSON Lines to stdout. Shennian handles everything else.
+
+```
+Phone / Browser ←→ Shennian Cloud ←→ Shennian CLI ←→ stdin/stdout ←→ Your Agent
+```
+
+---
+
+## Quickstart — Three Steps
 
 ### 1. Write your agent
 
-The simplest agent is a script that handles two commands:
+The minimum viable agent handles two commands: `/caps` and `/run`.
 
-**Python** — `my_agent.py`
+**Python**
 
 ```python
 #!/usr/bin/env python3
@@ -39,105 +43,7 @@ if sys.argv[1] == "/run":
     print(json.dumps({"state": "final"}))
 ```
 
-**Bash** — `my_agent.sh`
-
-```bash
-#!/bin/bash
-if [ "$1" = "/caps" ]; then
-  echo '{"name":"My Agent","model":"echo-v1","mode":"spawn","version":"1.0.0"}'
-  exit 0
-fi
-if [ "$1" = "/run" ]; then
-  msg=$(cat)
-  echo "{\"state\":\"delta\",\"text\":\"You said: $msg\"}"
-  echo '{"state":"final"}'
-fi
-```
-
-### 2. Register with Shennian
-
-```bash
-# Make sure Shennian CLI is running on your machine
-shennian agent add my-agent --command "python /path/to/my_agent.py"
-```
-
-### 3. Use it from your phone
-
-Open the Shennian app → select your machine → pick "My Agent" → start chatting.
-
-That's it. Three steps.
-
----
-
-## Protocol at a Glance
-
-| Command | Purpose |
-|---|---|
-| `my-agent /caps` | Declare capabilities (name, model, mode) |
-| `my-agent /run --workdir=<path>` | Handle one message (spawn mode) |
-| `my-agent /start --workdir=<path>` | Start long-lived session (stdio mode) |
-
-### Two Modes
-
-| Mode | How it works | Best for |
-|---|---|---|
-| **spawn** | New process per message. stdin = text, stdout = events, exit = done | Simple agents, scripts |
-| **stdio** | Long-lived process. stdin/stdout = JSON Lines bidirectional | Stateful agents, proactive push |
-
-### Event Types (stdout JSON Lines)
-
-| State | Purpose |
-|---|---|
-| `delta` | Stream a text chunk to the user |
-| `final` | Signal turn complete |
-| `error` | Report an error (ends turn) |
-| `tool-call` | Show tool invocation in UI |
-| `tool-result` | Show tool result in UI |
-| `notify` | Push notification (proactive agents only) |
-
-Full specification: **[PROTOCOL.md](./PROTOCOL.md)**
-
----
-
-## Examples
-
-Minimal agents with no SDK dependency — just raw stdin/stdout:
-
-| Language | Mode | Source |
-|---|---|---|
-| Bash | spawn | [examples/bash/agent.sh](./examples/bash/agent.sh) |
-| Python | spawn | [examples/python/agent.py](./examples/python/agent.py) |
-| Node.js | stdio | [examples/node/agent.mjs](./examples/node/agent.mjs) |
-
----
-
-## SDK
-
-Optional helper libraries that handle protocol boilerplate for you:
-
-### Python
-
-```bash
-pip install shennian-agent
-```
-
-```python
-from shennian_agent import Agent
-
-agent = Agent(name="My Agent", model="gpt-4o")
-
-@agent.on_send
-def handle(text, session_id, attachments):
-    for chunk in call_my_llm(text):
-        agent.delta(chunk)
-    agent.final()
-
-agent.run()
-```
-
-See [sdk/python/](./sdk/python/) for full docs and examples.
-
-### Node.js
+**Node.js** (using the SDK)
 
 ```bash
 npm install @shennian/agent
@@ -158,46 +64,138 @@ agent.onSend(async ({ text }) => {
 agent.run()
 ```
 
-See [sdk/node/](./sdk/node/) for full docs and examples.
+**Bash**
+
+```bash
+#!/bin/bash
+if [ "$1" = "/caps" ]; then
+  echo '{"name":"My Agent","model":"echo-v1","mode":"spawn","version":"1.0.0"}'
+  exit 0
+fi
+if [ "$1" = "/run" ]; then
+  msg=$(cat)
+  echo "{\"state\":\"delta\",\"text\":\"You said: $msg\"}"
+  echo '{"state":"final"}'
+fi
+```
+
+### 2. Install Shennian CLI and register your agent
+
+```bash
+# Install CLI (requires Node.js 18+)
+npx shennian
+
+# Register your agent (CLI auto-runs /caps to detect capabilities)
+shennian agent add my-agent --command "python /path/to/my_agent.py"
+```
+
+### 3. Use it from your phone
+
+Open Shennian → select your machine → pick **My Agent** → start chatting.
+
+That's it.
+
+---
+
+## Protocol at a Glance
+
+### Two Lifecycle Modes
+
+| Mode | How it works | Best for |
+|---|---|---|
+| **spawn** | New process per message. stdin = text, stdout = events, exit = done. | Simple scripts, stateless agents |
+| **stdio** | Long-lived process. Bidirectional JSON Lines over stdin/stdout. | Stateful agents, proactive push |
+
+### Commands
+
+| Command | Purpose |
+|---|---|
+| `my-agent /caps` | Declare capabilities (name, model, mode) |
+| `my-agent /run --workdir=<path>` | Handle one message (spawn mode) |
+| `my-agent /start --workdir=<path>` | Start long-lived session (stdio mode) |
+
+### Event Types (stdout → Shennian)
+
+| State | Description |
+|---|---|
+| `delta` | Stream a text chunk to the user |
+| `final` | Signal turn complete |
+| `error` | Report an error, ends the turn |
+| `tool-call` | Show a tool invocation in the UI |
+| `tool-result` | Show a tool result in the UI |
+| `notify` | Push notification to phone (stdio + proactive only) |
+
+Full specification: **[PROTOCOL.md](./PROTOCOL.md)**
 
 ---
 
 ## Proactive Agents
 
-Agents in **stdio** mode with `proactive: true` can push messages without user interaction — monitoring alerts, cron results, webhook notifications:
+Agents in **stdio** mode with `proactive: true` can push notifications without user interaction — perfect for monitoring, cron jobs, and webhook triggers:
 
 ```python
+from shennian_agent import Agent
+
 agent = Agent(name="Monitor", model="monitor-v1", mode="stdio", proactive=True)
 
 @agent.on_send
 def handle(text, **kwargs):
-    agent.delta("Monitoring configured.")
+    agent.delta("Monitoring active.")
     agent.final()
 
-def on_alert(alert):
-    agent.notify(title="Alert", text=alert.message, source="monitor:cpu")
+def on_alert(message):
+    agent.notify(title="Alert", text=message, source="monitor:cpu")
 
 agent.run()
 ```
 
-The user gets a push notification on their phone. Just like a built-in agent.
+The user gets a push notification on their phone — no polling required.
 
 ---
 
-## Registration
+## CLI Reference
 
 ```bash
-# Add
+# Register a custom agent
 shennian agent add <name> --command "<command>"
 
-# List
+# Examples
+shennian agent add gpt      --command "python ~/agents/gpt_agent.py"
+shennian agent add searcher --command "node ~/agents/search.mjs"
+shennian agent add local    --command "/usr/local/bin/my-agent"
+
+# List registered agents
 shennian agent list
 
-# Remove
+# Remove an agent
 shennian agent remove <name>
 ```
 
-The agent appears in the Shennian app as `custom:<name>` alongside built-in agents.
+Once registered, the agent appears in the Shennian app as `custom:<name>` alongside built-in agents (Claude, Codex, Gemini, etc.).
+
+---
+
+## SDK
+
+Optional helper libraries — handle protocol boilerplate so you can focus on your agent logic.
+
+| Language | Package | Source |
+|---|---|---|
+| Node.js | `npm install @shennian/agent` | [sdk/node/](./sdk/node/) |
+| Python | `pip install shennian-agent` | [sdk/python/](./sdk/python/) |
+
+---
+
+## Examples
+
+Zero-dependency examples — just raw stdin/stdout, no SDK required:
+
+| Language | Mode | Source |
+|---|---|---|
+| Node.js | spawn | [examples/node/hello-spawn.mjs](./examples/node/hello-spawn.mjs) |
+| Node.js | stdio | [examples/node/agent.mjs](./examples/node/agent.mjs) |
+| Python | spawn | [examples/python/agent.py](./examples/python/agent.py) |
+| Bash | spawn | [examples/bash/agent.sh](./examples/bash/agent.sh) |
 
 ---
 
