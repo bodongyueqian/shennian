@@ -135,6 +135,10 @@ shennian agent remove my-agent
 
 注册后，自定义 Agent 会与 Claude、Codex 等内置 Agent 一同出现在神念 App 中。
 
+### 会话恢复
+
+支持跨重启多轮对话的 Agent，需要在 `/caps` 中声明 `resume: true`，在 `final` 事件中返回 `agentSessionId`，并在 `/run` 中接受 `--resume <id>` 参数。神念负责持久化和回传 session ID，Agent 只需根据 ID 恢复自身状态。
+
 完整协议规范：**[PROTOCOL.md](./PROTOCOL.md)**
 
 ---
@@ -150,12 +154,11 @@ shennian agent remove my-agent
 
 以下示例无需 SDK，零依赖即可运行：
 
-| 语言 | 模式 | 源码 |
-|---|---|---|
-| Node.js | spawn | [examples/node/hello-spawn.mjs](./examples/node/hello-spawn.mjs) |
-| Node.js | stdio | [examples/node/agent.mjs](./examples/node/agent.mjs) |
-| Python | spawn | [examples/python/agent.py](./examples/python/agent.py) |
-| Bash | spawn | [examples/bash/agent.sh](./examples/bash/agent.sh) |
+| 语言 | 源码 |
+|---|---|
+| Node.js | [examples/node/hello-spawn.mjs](./examples/node/hello-spawn.mjs) |
+| Python | [examples/python/agent.py](./examples/python/agent.py) |
+| Bash | [examples/bash/agent.sh](./examples/bash/agent.sh) |
 
 ---
 

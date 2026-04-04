@@ -135,6 +135,10 @@ shennian agent remove my-agent
 
 The agent appears in the Shennian app alongside Claude, Codex, and other built-in agents.
 
+### Session Resume
+
+Agents that support multi-turn conversations across restarts should set `resume: true` in `/caps`, emit `agentSessionId` in their `final` event, and accept `--resume <id>` in `/run`. Shennian handles persisting and passing back the session ID — your agent just needs to restore its own state.
+
 Full protocol specification: **[PROTOCOL.md](./PROTOCOL.md)**
 
 ---
@@ -150,12 +154,11 @@ Full protocol specification: **[PROTOCOL.md](./PROTOCOL.md)**
 
 Zero-dependency examples, no SDK required:
 
-| Language | Mode | Source |
-|---|---|---|
-| Node.js | spawn | [examples/node/hello-spawn.mjs](./examples/node/hello-spawn.mjs) |
-| Node.js | stdio | [examples/node/agent.mjs](./examples/node/agent.mjs) |
-| Python | spawn | [examples/python/agent.py](./examples/python/agent.py) |
-| Bash | spawn | [examples/bash/agent.sh](./examples/bash/agent.sh) |
+| Language | Source |
+|---|---|
+| Node.js | [examples/node/hello-spawn.mjs](./examples/node/hello-spawn.mjs) |
+| Python | [examples/python/agent.py](./examples/python/agent.py) |
+| Bash | [examples/bash/agent.sh](./examples/bash/agent.sh) |
 
 ---
 
