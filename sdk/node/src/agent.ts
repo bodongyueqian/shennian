@@ -11,7 +11,9 @@ import type {
 
 export type AgentOptions = {
   name: string
-  model: string
+  model?: string
+  models?: string[]
+  defaultModel?: string
   mode?: 'spawn' | 'stdio'
   proactive?: boolean
   resume?: boolean
@@ -26,9 +28,17 @@ export class Agent {
   private resumeHandler?: (params: ResumeParams) => void | Promise<void>
 
   constructor(opts: AgentOptions) {
+    const models = opts.models?.length
+      ? opts.models
+      : opts.model
+        ? [opts.model]
+        : []
+    const defaultModel = opts.defaultModel ?? opts.model ?? models[0] ?? 'unknown'
     this.caps = {
       name: opts.name,
-      model: opts.model,
+      model: defaultModel,
+      models: models.length > 0 ? models : undefined,
+      defaultModel: models.length > 0 ? defaultModel : undefined,
       mode: opts.mode ?? 'spawn',
       proactive: opts.proactive,
       resume: opts.resume,
@@ -128,6 +138,7 @@ export class Agent {
     const args = process.argv.slice(3)
     let sessionId = ''
     let resumeSessionId = ''
+    let modelId = ''
     const attachments: { path: string; name: string; mime: string }[] = []
 
     for (let i = 0; i < args.length; i++) {
@@ -140,6 +151,9 @@ export class Agent {
           break
         case '--workdir':
           process.chdir(args[++i] ?? '.')
+          break
+        case '--model':
+          modelId = args[++i] ?? ''
           break
         case '--attachment': {
           const raw = args[++i] ?? ''
@@ -165,7 +179,7 @@ export class Agent {
       if (!this.sendHandler) return
       this.newRun()
       void Promise.resolve(
-        this.sendHandler({ text, sessionId, attachments })
+        this.sendHandler({ text, sessionId, attachments, modelId: modelId || undefined })
       ).catch((err: Error) => this.error(err.message))
     })
   }

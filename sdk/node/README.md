@@ -17,11 +17,12 @@ import { Agent } from '@shennian/agent'
 
 const agent = new Agent({
   name: 'My Agent',
-  model: 'gpt-4o',
+  models: ['gpt-4o', 'gpt-4.1'],
+  defaultModel: 'gpt-4o',
 })
 
-agent.onSend(async ({ text, sessionId }) => {
-  agent.delta('Thinking...')
+agent.onSend(async ({ text, sessionId, modelId }) => {
+  agent.delta(`Thinking with ${modelId ?? 'default model'}...`)
   // call your LLM here
   agent.delta('Here is the answer.')
   agent.final()
@@ -38,12 +39,19 @@ agent.run()
 echo "Hello" | my-agent /run --session abc --workdir /tmp
 ```
 
+With explicit model selection:
+
+```bash
+echo "Hello" | my-agent /run --session abc --workdir /tmp --model gpt-4.1
+```
+
 **Stdio mode** — long-running process, receives JSONL on stdin:
 
 ```typescript
 const agent = new Agent({
   name: 'My Agent',
-  model: 'gpt-4o',
+  models: ['gpt-4o', 'gpt-4.1'],
+  defaultModel: 'gpt-4o',
   mode: 'stdio',
   proactive: true,
 })

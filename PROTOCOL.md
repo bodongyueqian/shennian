@@ -47,6 +47,8 @@ The agent prints a single JSON line to stdout and exits:
 {
   "name": "My Agent",
   "model": "gpt-4o",
+  "models": ["gpt-4o", "gpt-4.1"],
+  "defaultModel": "gpt-4o",
   "mode": "spawn",
   "proactive": false,
   "resume": false,
@@ -59,10 +61,14 @@ The agent prints a single JSON line to stdout and exits:
 | Field | Required | Type | Description |
 |---|---|---|---|
 | `name` | yes | string | Display name shown in Shennian clients |
-| `model` | yes | string | Model identifier shown in agent list |
+| `model` | yes | string | Default model identifier. Kept for backward compatibility |
+| `models` | no | string[] | Full list of selectable model IDs exposed by the agent |
+| `defaultModel` | no | string | Default model ID when `models` is present |
 | `mode` | yes | `"spawn"` | Lifecycle mode. Currently only `"spawn"` is supported |
 | `resume` | no | boolean | Does the agent support resuming previous sessions? Default `false` |
 | `version` | no | string | Agent version (semver recommended) |
+
+If your agent exposes multiple models, prefer returning both `models` and `defaultModel`. Shennian uses these values directly in the UI and passes the selected model back on each run.
 
 ---
 
@@ -83,6 +89,7 @@ my-agent /run [options]
 | `--workdir <path>` | yes | Working directory for the agent |
 | `--session <id>` | no | Shennian session ID |
 | `--resume <id>` | no | Agent-native session ID to resume (only if `resume: true` in caps) |
+| `--model <id>` | no | Selected model ID from the Shennian client |
 | `--attachment <path>` | no | Path to an attached file. Can be repeated for multiple files |
 
 ### stdin
@@ -104,7 +111,7 @@ JSON Lines events (see [Section 4: Events](#4-event-format)).
 ### Example flow
 
 ```
-$ echo "What files are in this project?" | my-agent /run --workdir=/home/user/project
+$ echo "What files are in this project?" | my-agent /run --workdir=/home/user/project --model gpt-4o
 
 {"state":"delta","text":"Let me check the project structure.\n"}
 {"state":"tool-call","name":"list_dir","args":{"path":"."}}
@@ -237,7 +244,7 @@ Shennian does not impose a global timeout. The user can abort a running agent fr
 
 Your agent must handle two commands:
 1. `my-agent /caps` → print caps JSON, exit
-2. `my-agent /run --workdir=<path>` → read stdin, print JSONL events to stdout, exit
+2. `my-agent /run --workdir=<path> [--model=<id>]` → read stdin, print JSONL events to stdout, exit
 
 That's it. Everything else is optional.
 

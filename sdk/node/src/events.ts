@@ -18,6 +18,8 @@ export type BaseFields = { runId?: string; seq?: number }
 export type Caps = {
   name: string
   model: string
+  models?: string[]
+  defaultModel?: string
   mode: 'spawn' | 'stdio'
   proactive?: boolean
   resume?: boolean
@@ -30,6 +32,7 @@ export type SendParams = {
   text: string
   sessionId: string
   attachments: Attachment[]
+  modelId?: string
 }
 
 export type ResumeParams = {
