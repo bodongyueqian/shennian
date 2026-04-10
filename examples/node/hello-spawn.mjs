@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* global process */
 /**
  * Minimal Shennian agent — spawn mode, pure Node.js (no dependencies).
  *

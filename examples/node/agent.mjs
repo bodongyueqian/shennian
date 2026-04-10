@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* global process */
 /**
  * Minimal Shennian agent in Node.js (stdio mode, no SDK).
  * Long-lived process that echoes user messages.
