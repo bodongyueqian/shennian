@@ -6,7 +6,7 @@
 
 ---
 
-在本机运行 `npx shennian`，扫码配对，即可从手机、浏览器或桌面远程操控 Claude、Codex、Gemini、Cursor、OpenClaw 等 AI Agent，查看文件系统，接收推送通知。
+在本机运行 `npx shennian`，扫码配对，即可从手机、浏览器或桌面远程操控 Claude、Codex、Nian 与自定义 Agent，查看文件系统，接收推送通知。
 
 ```bash
 npx shennian
@@ -26,15 +26,13 @@ npx shennian
 ## 核心功能
 
 **多 Agent 支持**
-在一个控制台内自由切换 Claude、Codex、Gemini、Cursor、OpenClaw。每个 Agent 独立会话，完整历史记录，断线自动恢复。
+在一个控制台内自由切换 Claude、Codex、Nian。每个 Agent 独立会话，完整历史记录，断线自动恢复。
 
 | Agent | 安装方式 |
 |---|---|
 | [Claude](https://claude.ai/code) | `npm install -g @anthropic-ai/claude-code` |
 | [Codex](https://github.com/openai/codex) | `npm install -g @openai/codex` |
-| [Gemini](https://github.com/google-gemini/gemini-cli) | `npm install -g @google/gemini-cli` |
-| [Cursor](https://www.cursor.com) | 桌面应用 |
-| [OpenClaw](https://openclaw.ai) | `npm install -g openclaw` |
+| Nian (Pi) | 内置 |
 
 **内置文件系统**
 直接从手机浏览目录树、预览代码文件、上传下载——无需 SSH。

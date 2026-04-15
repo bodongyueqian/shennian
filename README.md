@@ -6,7 +6,7 @@
 
 ---
 
-Run `npx shennian` on your machine, scan to pair, and remotely control Claude, Codex, Gemini, Cursor, OpenClaw and more from your phone, browser, or desktop.
+Run `npx shennian` on your machine, scan to pair, and remotely control Claude, Codex, Nian, and custom agents from your phone, browser, or desktop.
 
 ```bash
 npx shennian
@@ -26,15 +26,13 @@ Scan the QR code with the Shennian app — paired in under 30 seconds.
 ## Features
 
 **Multi-Agent Support**
-Switch between Claude, Codex, Gemini, Cursor, OpenClaw in one console. Independent sessions per agent, full history, reconnect and resume.
+Switch between Claude, Codex, and Nian in one console. Independent sessions per agent, full history, reconnect and resume.
 
 | Agent | Install |
 |---|---|
 | [Claude](https://claude.ai/code) | `npm install -g @anthropic-ai/claude-code` |
 | [Codex](https://github.com/openai/codex) | `npm install -g @openai/codex` |
-| [Gemini](https://github.com/google-gemini/gemini-cli) | `npm install -g @google/gemini-cli` |
-| [Cursor](https://www.cursor.com) | Desktop app |
-| [OpenClaw](https://openclaw.ai) | `npm install -g openclaw` |
+| Nian (Pi) | Built in |
 
 **Built-in File System**
 Browse directory trees, preview code files, upload and download — all from your phone. No SSH required.
@@ -133,7 +131,7 @@ shennian agent list
 shennian agent remove my-agent
 ```
 
-The agent appears in the Shennian app alongside Claude, Codex, and other built-in agents.
+The agent appears in the Shennian app alongside Claude, Codex, Nian, and other enabled agents.
 
 ### Session Resume
 

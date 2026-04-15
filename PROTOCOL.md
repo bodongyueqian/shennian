@@ -214,7 +214,7 @@ shennian agent list
 shennian agent remove my-agent
 ```
 
-Once registered, the agent appears in the Shennian mobile/web app alongside built-in agents (Claude, Cursor, etc.) under the type `custom:<name>`.
+Once registered, the agent appears in the Shennian mobile/web app alongside built-in agents (Claude, Codex, Nian, etc.) under the type `custom:<name>`.
 
 ---
 
