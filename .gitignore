@@ -1,5 +1,8 @@
 node_modules/
 dist/
+.env
+*.env
+.sessions/
 *.pyc
 __pycache__/
 *.egg-info/

@@ -84,64 +84,146 @@ shennian
 手机 / 浏览器 ←→ 神念云 ←→ Shennian CLI ←→ stdin/stdout ←→ 你的 Agent
 ```
 
-### 快速接入
+### 你的 Agent 至少要实现什么
 
-**Python**
+- `/caps`：声明 `name`、`model`、`models`、`defaultModel`、`mode`、`resume`
+- `/run`：从 stdin 读取用户输入，并向 stdout 输出 JSONL 事件
+- `--resume <id>`：如果你要支持真正的多轮续聊
+- `--model <id>`：如果你希望在神念里切换模型
+
+### 可直接复制的无 SDK Demo
+
+公开 subtree 里已经放了两份推荐起点：
+
+- Node: [examples/node/agent.mjs](./examples/node/agent.mjs)
+- Python: [examples/python/agent.py](./examples/python/agent.py)
+
+这两份 demo 都是：
+
+- 纯 Node.js / 纯 Python
+- 不依赖 Shennian SDK
+- 直接对接 DeepSeek OpenAI 兼容接口
+- 本地文件持久化 session，实现 `resume`
+- 在神念里暴露 `deepseek-chat` 和 `deepseek-reasoner`
+
+#### Node demo
+
+```bash
+cp examples/node/.env.example examples/node/.env
+# 在 examples/node/.env 里填 DEEPSEEK_API_KEY
+
+shennian agent add demo-node --command "node $(pwd)/examples/node/agent.mjs"
+shennian agent list
+```
+
+关键逻辑：
+
+```javascript
+if (command === '/caps') {
+  emit({
+    name: 'DeepSeek Demo (Node)',
+    model: config.defaultModel,
+    models: config.models,
+    defaultModel: config.defaultModel,
+    mode: 'spawn',
+    resume: true,
+  })
+}
+
+if (command === '/run') {
+  const agentSessionId = args.resumeId || args.sessionId || randomUUID()
+  const history = loadSessionMessages(config.sessionDir, agentSessionId)
+  const userText = await readStdin()
+  const messages = [
+    { role: 'system', content: config.systemPrompt },
+    ...history,
+    { role: 'user', content: userText },
+  ]
+
+  const reply = await callDeepSeek({
+    apiKey: config.apiKey,
+    baseUrl: config.baseUrl,
+    model: args.modelId || config.defaultModel,
+    messages,
+  })
+
+  saveSessionMessages(config.sessionDir, agentSessionId, [
+    ...history,
+    { role: 'user', content: userText },
+    { role: 'assistant', content: reply.text },
+  ])
+
+  emit({ state: 'delta', text: reply.text })
+  emit({ state: 'final', usage: reply.usage, agentSessionId })
+}
+```
+
+#### Python demo
+
+```bash
+cp examples/python/.env.example examples/python/.env
+# 在 examples/python/.env 里填 DEEPSEEK_API_KEY
+
+shennian agent add demo-python --command "python3 $(pwd)/examples/python/agent.py"
+shennian agent list
+```
+
+关键逻辑：
 
 ```python
-#!/usr/bin/env python3
-import sys, json
+def caps() -> None:
+    emit(
+        {
+            "name": "DeepSeek Demo (Python)",
+            "model": config["default_model"],
+            "models": config["models"],
+            "defaultModel": config["default_model"],
+            "mode": "spawn",
+            "resume": True,
+        }
+    )
 
-if sys.argv[1] == "/caps":
-    print(json.dumps({"name": "我的 Agent", "model": "gpt-4o", "mode": "spawn"}))
-    sys.exit(0)
-
-if sys.argv[1] == "/run":
-    message = sys.stdin.read()
-    print(json.dumps({"state": "delta", "text": f"你说: {message}"}))
-    print(json.dumps({"state": "final"}))
+def run(workdir: str, session: str | None, resume: str | None, model: str | None, attachments: list[str]) -> None:
+    agent_session_id = resume or session or str(uuid.uuid4())
+    history = load_session_messages(config["session_dir"], agent_session_id)
+    user_text = sys.stdin.read().strip()
+    messages = [{"role": "system", "content": config["system_prompt"]}, *history, {"role": "user", "content": user_text}]
+    reply_text, usage = call_deepseek(
+        api_key=str(config["api_key"]),
+        base_url=str(config["base_url"]),
+        model=model or str(config["default_model"]),
+        messages=messages,
+    )
+    save_session_messages(
+        config["session_dir"],
+        agent_session_id,
+        [*history, {"role": "user", "content": user_text}, {"role": "assistant", "content": reply_text}],
+    )
+    emit({"state": "delta", "text": reply_text})
+    emit({"state": "final", "usage": usage, "agentSessionId": agent_session_id})
 ```
 
-**Node.js**
+### 注册、使用、移除
 
 ```bash
-npm install @shennian/agent
-```
+shennian agent add demo-node --command "node /绝对路径/examples/node/agent.mjs"
+shennian agent add demo-python --command "python3 /绝对路径/examples/python/agent.py"
 
-```typescript
-import { Agent } from '@shennian/agent'
-
-const agent = new Agent({ name: '我的 Agent', model: 'gpt-4o' })
-
-agent.onSend(async ({ text }) => {
-  for await (const chunk of callMyLLM(text)) {
-    agent.delta(chunk)
-  }
-  agent.final()
-})
-
-agent.run()
-```
-
-### 注册到 CLI
-
-```bash
-shennian agent add my-agent --command "python /path/to/my_agent.py"
 shennian agent list
-shennian agent remove my-agent
+
+shennian agent remove demo-node
+shennian agent remove demo-python
 ```
 
-注册后，自定义 Agent 会与 Claude、Codex 等内置 Agent 一同出现在神念 App 中。
-
-### 会话恢复
-
-支持跨重启多轮对话的 Agent，需要在 `/caps` 中声明 `resume: true`，在 `final` 事件中返回 `agentSessionId`，并在 `/run` 中接受 `--resume <id>` 参数。神念负责持久化和回传 session ID，Agent 只需根据 ID 恢复自身状态。
+`agent add` 后，它会在神念里显示为 `custom:demo-node` 或 `custom:demo-python`。可以正常选择、发送第一轮、继续发送第二轮，并通过 `agentSessionId` 持续续聊，因为 demo 自己负责本地 session 管理。
 
 完整协议规范：**[PROTOCOL.md](./PROTOCOL.md)**
 
 ---
 
 ## SDK
+
+SDK 是可选项，不是接入前提。想完全手写协议，就直接用上面的 demo 即可。
 
 | 语言 | 包 |
 |---|---|

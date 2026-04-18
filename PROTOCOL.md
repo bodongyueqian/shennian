@@ -16,6 +16,8 @@ Phone/Browser ←→ Shennian Relay Server ←→ Shennian CLI ←→ [stdin/std
 
 Your agent runs in a specified working directory and has full local filesystem access, just like any CLI tool.
 
+> Prefer starting from the zero-SDK demos in `examples/node/agent.mjs` and `examples/python/agent.py`. They already implement `models`, `defaultModel`, `resume`, and local session persistence.
+
 > **Session management**: If your agent supports resuming conversations (`resume: true` in caps), it is responsible for persisting and restoring its own session state. Shennian passes a `--resume <id>` option with the agent's own session ID so it can pick up where it left off.
 
 ---

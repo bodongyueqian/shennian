@@ -84,64 +84,146 @@ Your agent is a CLI program that reads from stdin and writes JSON Lines to stdou
 Phone / Browser ←→ Shennian Cloud ←→ Shennian CLI ←→ stdin/stdout ←→ Your Agent
 ```
 
-### Quickstart
+### What your agent must implement
 
-**Python**
+- `/caps` to describe `name`, `model`, `models`, `defaultModel`, `mode`, and `resume`
+- `/run` to read user text from stdin and emit JSONL events to stdout
+- `--resume <id>` if you want real multi-turn continuity
+- `--model <id>` if you expose multiple models in the UI
+
+### Zero-SDK demos you can copy
+
+The public examples in this repo are the recommended starting point:
+
+- Node: [examples/node/agent.mjs](./examples/node/agent.mjs)
+- Python: [examples/python/agent.py](./examples/python/agent.py)
+
+Both demos are:
+
+- plain Node.js / plain Python
+- no Shennian SDK
+- wired to the DeepSeek OpenAI-compatible API
+- local-file based for `resume`
+- exposing `deepseek-chat` and `deepseek-reasoner` through `models`
+
+#### Node demo
+
+```bash
+cp examples/node/.env.example examples/node/.env
+# fill DEEPSEEK_API_KEY in examples/node/.env
+
+shennian agent add demo-node --command "node $(pwd)/examples/node/agent.mjs"
+shennian agent list
+```
+
+Key parts of the demo:
+
+```javascript
+if (command === '/caps') {
+  emit({
+    name: 'DeepSeek Demo (Node)',
+    model: config.defaultModel,
+    models: config.models,
+    defaultModel: config.defaultModel,
+    mode: 'spawn',
+    resume: true,
+  })
+}
+
+if (command === '/run') {
+  const agentSessionId = args.resumeId || args.sessionId || randomUUID()
+  const history = loadSessionMessages(config.sessionDir, agentSessionId)
+  const userText = await readStdin()
+  const messages = [
+    { role: 'system', content: config.systemPrompt },
+    ...history,
+    { role: 'user', content: userText },
+  ]
+
+  const reply = await callDeepSeek({
+    apiKey: config.apiKey,
+    baseUrl: config.baseUrl,
+    model: args.modelId || config.defaultModel,
+    messages,
+  })
+
+  saveSessionMessages(config.sessionDir, agentSessionId, [
+    ...history,
+    { role: 'user', content: userText },
+    { role: 'assistant', content: reply.text },
+  ])
+
+  emit({ state: 'delta', text: reply.text })
+  emit({ state: 'final', usage: reply.usage, agentSessionId })
+}
+```
+
+#### Python demo
+
+```bash
+cp examples/python/.env.example examples/python/.env
+# fill DEEPSEEK_API_KEY in examples/python/.env
+
+shennian agent add demo-python --command "python3 $(pwd)/examples/python/agent.py"
+shennian agent list
+```
+
+Key parts of the demo:
 
 ```python
-#!/usr/bin/env python3
-import sys, json
+def caps() -> None:
+    emit(
+        {
+            "name": "DeepSeek Demo (Python)",
+            "model": config["default_model"],
+            "models": config["models"],
+            "defaultModel": config["default_model"],
+            "mode": "spawn",
+            "resume": True,
+        }
+    )
 
-if sys.argv[1] == "/caps":
-    print(json.dumps({"name": "My Agent", "model": "gpt-4o", "mode": "spawn"}))
-    sys.exit(0)
-
-if sys.argv[1] == "/run":
-    message = sys.stdin.read()
-    print(json.dumps({"state": "delta", "text": f"You said: {message}"}))
-    print(json.dumps({"state": "final"}))
+def run(workdir: str, session: str | None, resume: str | None, model: str | None, attachments: list[str]) -> None:
+    agent_session_id = resume or session or str(uuid.uuid4())
+    history = load_session_messages(config["session_dir"], agent_session_id)
+    user_text = sys.stdin.read().strip()
+    messages = [{"role": "system", "content": config["system_prompt"]}, *history, {"role": "user", "content": user_text}]
+    reply_text, usage = call_deepseek(
+        api_key=str(config["api_key"]),
+        base_url=str(config["base_url"]),
+        model=model or str(config["default_model"]),
+        messages=messages,
+    )
+    save_session_messages(
+        config["session_dir"],
+        agent_session_id,
+        [*history, {"role": "user", "content": user_text}, {"role": "assistant", "content": reply_text}],
+    )
+    emit({"state": "delta", "text": reply_text})
+    emit({"state": "final", "usage": usage, "agentSessionId": agent_session_id})
 ```
 
-**Node.js**
+### Register, use, and remove
 
 ```bash
-npm install @shennian/agent
-```
+shennian agent add demo-node --command "node /abs/path/to/examples/node/agent.mjs"
+shennian agent add demo-python --command "python3 /abs/path/to/examples/python/agent.py"
 
-```typescript
-import { Agent } from '@shennian/agent'
-
-const agent = new Agent({ name: 'My Agent', model: 'gpt-4o' })
-
-agent.onSend(async ({ text }) => {
-  for await (const chunk of callMyLLM(text)) {
-    agent.delta(chunk)
-  }
-  agent.final()
-})
-
-agent.run()
-```
-
-### Register
-
-```bash
-shennian agent add my-agent --command "python /path/to/my_agent.py"
 shennian agent list
-shennian agent remove my-agent
+
+shennian agent remove demo-node
+shennian agent remove demo-python
 ```
 
-The agent appears in the Shennian app alongside Claude, Codex, Nian, and other enabled agents.
-
-### Session Resume
-
-Agents that support multi-turn conversations across restarts should set `resume: true` in `/caps`, emit `agentSessionId` in their `final` event, and accept `--resume <id>` in `/run`. Shennian handles persisting and passing back the session ID — your agent just needs to restore its own state.
+After `agent add`, the agent appears in Shennian as `custom:demo-node` or `custom:demo-python`. You can select it, chat normally, send a second turn, and keep resuming because the demo stores its own session state and returns `agentSessionId` on every `final`.
 
 Full protocol specification: **[PROTOCOL.md](./PROTOCOL.md)**
 
 ---
 
 ## SDK
+
+SDKs are optional. Use them only if you want helpers instead of writing the protocol yourself.
 
 | Language | Package |
 |---|---|
