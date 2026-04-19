@@ -110,7 +110,7 @@ shennian
 
 ```bash
 cp examples/node/.env.example examples/node/.env
-# 在 examples/node/.env 里填 DEEPSEEK_API_KEY
+# 在 examples/node/.env 里填 LLM_API_KEY
 
 shennian agent add demo-node --command "node $(pwd)/examples/node/agent.mjs"
 shennian agent list
@@ -119,12 +119,14 @@ shennian agent list
 关键逻辑：
 
 ```javascript
+const supportedModels = ['sonnet-4', 'gpt-4.1']
+
 if (command === '/caps') {
   emit({
-    name: 'DeepSeek Demo (Node)',
-    model: config.defaultModel,
-    models: config.models,
-    defaultModel: config.defaultModel,
+    name: 'My Demo Agent',
+    model: 'sonnet-4',
+    models: supportedModels,
+    defaultModel: 'sonnet-4',
     mode: 'spawn',
     resume: true,
   })
@@ -132,22 +134,22 @@ if (command === '/caps') {
 
 if (command === '/run') {
   const agentSessionId = args.resumeId || args.sessionId || randomUUID()
-  const history = loadSessionMessages(config.sessionDir, agentSessionId)
+  const history = loadSessionMessages('.sessions', agentSessionId)
   const userText = await readStdin()
   const messages = [
-    { role: 'system', content: config.systemPrompt },
+    { role: 'system', content: 'You are a helpful coding agent.' },
     ...history,
     { role: 'user', content: userText },
   ]
 
-  const reply = await callDeepSeek({
-    apiKey: config.apiKey,
-    baseUrl: config.baseUrl,
-    model: args.modelId || config.defaultModel,
+  const reply = await callYourModelProvider({
+    apiKey: process.env.LLM_API_KEY,
+    baseUrl: 'https://api.example.com/v1',
+    model: args.modelId || 'sonnet-4',
     messages,
   })
 
-  saveSessionMessages(config.sessionDir, agentSessionId, [
+  saveSessionMessages('.sessions', agentSessionId, [
     ...history,
     { role: 'user', content: userText },
     { role: 'assistant', content: reply.text },
@@ -162,7 +164,7 @@ if (command === '/run') {
 
 ```bash
 cp examples/python/.env.example examples/python/.env
-# 在 examples/python/.env 里填 DEEPSEEK_API_KEY
+# 在 examples/python/.env 里填 LLM_API_KEY
 
 shennian agent add demo-python --command "python3 $(pwd)/examples/python/agent.py"
 shennian agent list
@@ -174,10 +176,10 @@ shennian agent list
 def caps() -> None:
     emit(
         {
-            "name": "DeepSeek Demo (Python)",
-            "model": config["default_model"],
-            "models": config["models"],
-            "defaultModel": config["default_model"],
+            "name": "My Demo Agent",
+            "model": "sonnet-4",
+            "models": ["sonnet-4", "gpt-4.1"],
+            "defaultModel": "sonnet-4",
             "mode": "spawn",
             "resume": True,
         }
@@ -185,17 +187,17 @@ def caps() -> None:
 
 def run(workdir: str, session: str | None, resume: str | None, model: str | None, attachments: list[str]) -> None:
     agent_session_id = resume or session or str(uuid.uuid4())
-    history = load_session_messages(config["session_dir"], agent_session_id)
+    history = load_session_messages(".sessions", agent_session_id)
     user_text = sys.stdin.read().strip()
-    messages = [{"role": "system", "content": config["system_prompt"]}, *history, {"role": "user", "content": user_text}]
-    reply_text, usage = call_deepseek(
-        api_key=str(config["api_key"]),
-        base_url=str(config["base_url"]),
-        model=model or str(config["default_model"]),
+    messages = [{"role": "system", "content": "You are a helpful coding agent."}, *history, {"role": "user", "content": user_text}]
+    reply_text, usage = call_model_provider(
+        api_key=os.environ["LLM_API_KEY"],
+        base_url="https://api.example.com/v1",
+        model=model or "sonnet-4",
         messages=messages,
     )
     save_session_messages(
-        config["session_dir"],
+        ".sessions",
         agent_session_id,
         [*history, {"role": "user", "content": user_text}, {"role": "assistant", "content": reply_text}],
     )
