@@ -66,8 +66,8 @@ Any program that reads stdin and writes JSONL to stdout can become a Shennian ag
 
 See [Custom Agent Protocol](#custom-agent-protocol) below.
 
-### Built-in file browser
-Walk your machine's filesystem from the phone — tree view, file preview, upload/download, switch working directories for an agent session on the fly. No SSH, no iCloud round-trip.
+### Remote file browser
+Walk that computer's filesystem from your phone — tree view, file preview, upload/download, switch working directories for an agent session on the fly. No SSH, no iCloud round-trip.
 
 <p align="center">
   <img src="./docs/screens/screen-files.png" alt="Mobile file browser" width="260" />
@@ -93,20 +93,20 @@ iOS, Android, and Web clients, built from the same codebase, synced by the same 
 
 ## Get Started
 
-### 1. Install the CLI on the machine you want to control
+### 1. Install on your computer
 ```bash
 npm install -g shennian
 shennian
 ```
 Requires Node.js ≥ 18. The command pairs the machine and starts the background daemon.
 
-### 2. Grab a client
+### 2. Install the app or open the Web
 - iOS — [TestFlight](https://testflight.apple.com/join/shennian) *(beta)*
 - Android — [APK download](https://shennian.ai/download)
 - Web — [shennian.ai](https://shennian.ai) (global) · [shennian.net](https://shennian.net) (China)
 
-### 3. Scan to pair
-The CLI prints a QR code the first time you run it. One scan and the machine is bound to your account forever. From then on, opening the app is enough.
+### 3. Scan to pair, start using
+The CLI prints a QR code. Scan once and you are paired for good — opening the app is enough from then on.
 
 ---
 
