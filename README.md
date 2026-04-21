@@ -1,15 +1,20 @@
-# Shennian — Control Your AI Agents, Anywhere
+# Shennian — Your AI Agent, Anywhere You Go
 
-> AI Agents at Your Fingertips. No port forwarding. No VPN. One command to start, scan to use.
+> Wherever your phone goes, the agent on your computer comes with you — no desk required.
 
 [中文文档](./README.zh.md) · [Protocol Spec](./PROTOCOL.md) · [shennian.ai](https://shennian.ai) · [shennian.net](https://shennian.net)
 
----
+<p align="center">
+  <img src="./docs/screens/screen-chat.png" alt="Shennian — chat from your phone, executed on your computer" width="320" />
+</p>
 
-Run `npx shennian` on your machine, scan to pair, and remotely control Claude, Codex, Nian, and custom agents from your phone, browser, or desktop.
+Shennian turns every computer you already own into something you can drive from your pocket. Run `shennian` on a machine, pair your phone once, and from then on Claude Code, Codex, Gemini, Cursor, and any custom agent you plug in all become one tap away — from the café, the subway, the kitchen, or bed.
+
+The agent still runs on **your** computer. Shennian is the bridge, not the compute.
 
 ```bash
-npx shennian
+npm install -g shennian
+shennian
 ```
 
 ```
@@ -19,77 +24,105 @@ npx shennian
   Token: sn-a3f9...
 ```
 
-Scan the QR code with the Shennian app — paired in under 30 seconds.
+---
+
+## Why Shennian
+
+**A workstation you don't have to sit at.**
+Your desktop is already where your code, credentials, and environments live. Shennian lets that machine answer the phone. Spin up a session from anywhere; the agent continues running on your hardware, reading your files, hitting your APIs, using your SSH keys.
+
+**Not another cloud IDE.**
+No code upload, no port forwarding, no VPN, no "please enable inbound rules." The CLI opens an outbound relay connection; everything stays local.
+
+**One console, every agent.**
+Claude Code, Codex, Gemini CLI, Cursor Agent, OpenClaw, the built-in Nian agent, and any custom protocol-compliant agent share the same phone UI, the same session list, the same push notifications.
 
 ---
 
-## Features
+## Core Capabilities
 
-**Multi-Agent Support**
-Switch between Claude, Codex, and Nian in one console. Independent sessions per agent, full history, reconnect and resume.
+### Popular agents, zero config
+Shennian auto-detects the agents already installed on your machine and exposes them on your phone. No per-agent integration, no configuration file to babysit.
 
-| Agent | Install |
+| Agent | How to install on your machine |
 |---|---|
-| [Claude](https://claude.ai/code) | `npm install -g @anthropic-ai/claude-code` |
+| [Claude Code](https://claude.ai/code) | `npm install -g @anthropic-ai/claude-code` |
 | [Codex](https://github.com/openai/codex) | `npm install -g @openai/codex` |
-| Nian (Pi) | Built in |
+| [Gemini CLI](https://github.com/google-gemini/gemini-cli) | `npm install -g @google/gemini-cli` |
+| [Cursor Agent](https://cursor.com) | Installed with Cursor |
+| [OpenClaw](https://openclaw.com) | Shennian detects the local gateway |
+| Nian (built in) | Ships with the CLI — no API key required |
 
-**Built-in File System**
-Browse directory trees, preview code files, upload and download — all from your phone. No SSH required.
+### Every machine is your workstation
+Mac at home, desktop at the office, beefy GPU box in the closet, rented cloud VM — anything with `shennian` installed shows up in the same machine list. Flip between them on your phone like switching apps. Agents execute **on the machine**, not in a sandbox.
 
-**Push Notifications**
-Get notified when an Agent task completes, a cron fires, or a hook triggers. Step away and come back when it's done.
+<p align="center">
+  <img src="./docs/screens/screen-machines.png" alt="Machines panel" width="260" />
+  <img src="./docs/screens/screen-sessions.png" alt="Conversations list across machines" width="260" />
+</p>
 
-**End-to-End Encryption**
-All traffic encrypted over TLS. QR-based machine auth with permission levels and expiry. Zero local port exposure.
+### Bring your own agent
+Any program that reads stdin and writes JSONL to stdout can become a Shennian agent. Implement `/caps` and `/run`, register with `shennian agent add`, and your agent inherits the relay, mobile UI, session persistence, and push notifications for free.
 
-**Machine Sharing**
-Generate time-limited, permission-scoped QR codes to let teammates access your local Agent environment. Revoke anytime.
+See [Custom Agent Protocol](#custom-agent-protocol) below.
 
-**All Platforms**
-iOS, Android, Web, macOS, and Windows. One account, all devices, seamless switching.
+### Built-in file browser
+Walk your machine's filesystem from the phone — tree view, file preview, upload/download, switch working directories for an agent session on the fly. No SSH, no iCloud round-trip.
+
+<p align="center">
+  <img src="./docs/screens/screen-files.png" alt="Mobile file browser" width="260" />
+</p>
+
+### Voice that actually works
+More than speech-to-text. The onboard model polishes sloppy speech into executable prompts and learns your jargon, so you can drive an agent while walking.
+
+<p align="center">
+  <img src="./docs/screens/screen-voice.png" alt="Voice input" width="260" />
+</p>
+
+### Push when it's done
+Cron, hook, or long-running agent task — Shennian pushes to your phone when it finishes. Close the app, walk away, come back when the dot turns green.
+
+### Machine sharing, on your terms
+Issue a time-boxed, permission-scoped invitation. A teammate or client gets temporary access to a specific machine without ever seeing your credentials. Revoke with one tap.
+
+### Everywhere you already are
+iOS, Android, and Web clients, built from the same codebase, synced by the same account. Start a session on the couch, keep typing from your laptop.
 
 ---
 
 ## Get Started
 
-### 1. Install and run
-
+### 1. Install the CLI on the machine you want to control
 ```bash
-# One-time run
-npx shennian
-
-# Or install globally
 npm install -g shennian
 shennian
 ```
+Requires Node.js ≥ 18. The command pairs the machine and starts the background daemon.
 
-### 2. Scan to pair
+### 2. Grab a client
+- iOS — [TestFlight](https://testflight.apple.com/join/shennian) *(beta)*
+- Android — [APK download](https://shennian.ai/download)
+- Web — [shennian.ai](https://shennian.ai) (global) · [shennian.net](https://shennian.net) (China)
 
-Scan the QR code or paste the token into the Shennian app — pairs permanently.
-
-### 3. Take control
-
-Select an Agent on your phone, send messages, browse files.
+### 3. Scan to pair
+The CLI prints a QR code the first time you run it. One scan and the machine is bound to your account forever. From then on, opening the app is enough.
 
 ---
 
 ## Custom Agent Protocol
 
-Beyond built-in agents, Shennian supports any custom agent via this open protocol.
-
-Your agent is a CLI program that reads from stdin and writes JSON Lines to stdout. Shennian handles the WebSocket relay, mobile UI, and push notifications.
+Shennian ships with popular agents, but the real superpower is **your agent**. The protocol is intentionally tiny: a CLI program that speaks stdin/stdout in JSONL.
 
 ```
 Phone / Browser ←→ Shennian Cloud ←→ Shennian CLI ←→ stdin/stdout ←→ Your Agent
 ```
 
 ### What your agent must implement
-
-- `/caps` to describe `name`, `model`, `models`, `defaultModel`, `mode`, and `resume`
-- `/run` to read user text from stdin and emit JSONL events to stdout
-- `--resume <id>` if you want real multi-turn continuity
-- `--model <id>` if you expose multiple models in the UI
+- `/caps` — describe `name`, `model`, `models`, `defaultModel`, `mode`, `resume`
+- `/run` — read user text from stdin, emit JSONL events to stdout
+- `--resume <id>` — for real multi-turn continuity
+- `--model <id>` — if you expose multiple models in the UI
 
 ### Zero-SDK demos you can copy
 
@@ -98,16 +131,9 @@ The public examples in this repo are the recommended starting point:
 - Node: [examples/node/agent.mjs](./examples/node/agent.mjs)
 - Python: [examples/python/agent.py](./examples/python/agent.py)
 
-Both demos are:
-
-- plain Node.js / plain Python
-- no Shennian SDK
-- wired to the DeepSeek OpenAI-compatible API
-- local-file based for `resume`
-- exposing `deepseek-chat` and `deepseek-reasoner` through `models`
+Both demos are plain Node.js / plain Python, no Shennian SDK, wired to the DeepSeek OpenAI-compatible API, with local-file `resume` and multi-model (`deepseek-chat`, `deepseek-reasoner`) exposure.
 
 #### Node demo
-
 ```bash
 cp examples/node/.env.example examples/node/.env
 # fill LLM_API_KEY in examples/node/.env
@@ -115,8 +141,6 @@ cp examples/node/.env.example examples/node/.env
 shennian agent add demo-node --command "node $(pwd)/examples/node/agent.mjs"
 shennian agent list
 ```
-
-Key parts of the demo:
 
 ```javascript
 const supportedModels = ['sonnet-4', 'gpt-4.1']
@@ -161,7 +185,6 @@ if (command === '/run') {
 ```
 
 #### Python demo
-
 ```bash
 cp examples/python/.env.example examples/python/.env
 # fill LLM_API_KEY in examples/python/.env
@@ -169,8 +192,6 @@ cp examples/python/.env.example examples/python/.env
 shennian agent add demo-python --command "python3 $(pwd)/examples/python/agent.py"
 shennian agent list
 ```
-
-Key parts of the demo:
 
 ```python
 def caps() -> None:
@@ -206,7 +227,6 @@ def run(workdir: str, session: str | None, resume: str | None, model: str | None
 ```
 
 ### Register, use, and remove
-
 ```bash
 shennian agent add demo-node --command "node /abs/path/to/examples/node/agent.mjs"
 shennian agent add demo-python --command "python3 /abs/path/to/examples/python/agent.py"
@@ -217,13 +237,13 @@ shennian agent remove demo-node
 shennian agent remove demo-python
 ```
 
-After `agent add`, the agent appears in Shennian as `custom:demo-node` or `custom:demo-python`. You can select it, chat normally, send a second turn, and keep resuming because the demo stores its own session state and returns `agentSessionId` on every `final`.
+After `agent add`, the agent appears in Shennian as `custom:demo-node` or `custom:demo-python`. Select it, chat normally, send a second turn, keep resuming — the demo stores its own session state and returns `agentSessionId` on every `final`.
 
 Full protocol specification: **[PROTOCOL.md](./PROTOCOL.md)**
 
 ---
 
-## SDK
+## SDKs
 
 SDKs are optional. Use them only if you want helpers instead of writing the protocol yourself.
 
@@ -232,7 +252,7 @@ SDKs are optional. Use them only if you want helpers instead of writing the prot
 | Node.js | `npm install @shennian/agent` |
 | Python | `pip install shennian-agent` |
 
-## Examples
+## More examples
 
 Zero-dependency examples, no SDK required:
 
